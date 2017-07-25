@@ -6,9 +6,10 @@
 const fs = require('fs');
 let EventEmitter = require('events').EventEmitter;
 let detector = require('./detection/algorithm');
-let start = process.hrtime();
 let time_holder = [];
-let count = 0;
+
+// let count = 0;
+// let start = process.hrtime();
 
 class AlgorithmCallBack{
     constructor(sensorId, broker, io){
@@ -68,16 +69,21 @@ class MqttApp{
     }
 
     sensorEvent(sensorId, data) {
-        // console.log('get sensor read:'+sensorId, data);
+        // // DELAY Reader
         // count += 1;
         // let stop = process.hrtime(start);
         // console.log('counter', count);
         // time_holder.push(stop);
         // start = process.hrtime();
+        // // DELAY Reader
 
-        console.log(sensorId, ',', data);        
+        // console.log(sensorId, ',', data, stop);        
 
-        // detector(sensorId, data, new AlgorithmCallBack(sensorId, this.broker, this.io));
+        // console.log('get sensor read:'+sensorId, data);
+        let start = process.hrtime();
+        detector(sensorId, data, new AlgorithmCallBack(sensorId, this.broker, this.io));
+        let stop = process.hrtime(start);
+        time_holder.push(stop);
     }
 
     phoneEvent (userId, data) {
