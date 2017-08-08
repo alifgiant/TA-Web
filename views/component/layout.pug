@@ -12,9 +12,11 @@ html
         // Bootstrap 3.3.6
         link(rel='stylesheet', href='/bootstrap/css/bootstrap.min.css')
         // Font Awesome
-        link(rel='stylesheet', href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.5.0/css/font-awesome.min.css')
+        //link(rel='stylesheet', href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.5.0/css/font-awesome.min.css')
+        link(rel='stylesheet', href='/css/font-awesome.min.css')
         // Ionicons
-        link(rel='stylesheet', href='https://cdnjs.cloudflare.com/ajax/libs/ionicons/2.0.1/css/ionicons.min.css')
+        //link(rel='stylesheet', href='https://cdnjs.cloudflare.com/ajax/libs/ionicons/2.0.1/css/ionicons.min.css')
+        link(rel='stylesheet', href='/dist/css/ionicons.min.css')
         // Theme style
         link(rel='stylesheet', href='/dist/css/AdminLTE.min.css')
         //
@@ -37,7 +39,10 @@ html
             block content
             // Main Footer
             block footer
+
+            audio#audio(src='/sound/woop-woop.wav', autostart='false')
         // ./wrapper
+
         // REQUIRED JS SCRIPTS 
             jQuery 2.2.3
         script(src='/plugins/jQuery/jquery-2.2.3.min.js')        
@@ -50,10 +55,9 @@ html
         // FLOT RESIZE PLUGIN - allows the chart to redraw when the window is resized
         script(src='/plugins/flot/jquery.flot.resize.min.js')                
 
-        script(src="/socket.io/socket.io.js")
-            
+        script(src="/socket.io/socket.io.js")            
         // Jantung Web App
-        script(src='/js/web_app.js')        
+        script(src='/js/web_app.js')
 
         //
             Optionally, you can add Slimscroll and FastClick plugins.

@@ -1,12 +1,12 @@
-mixin insert_table(index, patient)
+mixin insert_table(index, alert)
     tr
         td= index+1 + '.'
-        td= patient.full_name
-        td= patient.device_id
-        td= patient.phone_num
-        td            
-            a.btn.btn-sm.btn-primary(href='javascript:setupPatientList("'+ patient.id +'")')
-                i.fa.fa-heartbeat
+        td= alert.type.toUpperCase()
+        td= alert.time
+        td= alert.full_name
+        td= alert.device_id
+        td= alert.phone_num        
+        td= alert.occurance
 
 // Content Header (Page header)
 section.content-header
@@ -28,11 +28,13 @@ section.content
                 tbody
                     tr
                         th(style='width: 10px') #
+                        th(style='width: 50px') Type
+                        th Time
                         th Name
                         th Device
-                        th Phone
-                        th(style='width: 50px') Type
-                    // each val, index in patients
+                        th Phone                        
+                        th(style='width: 50px') Count
+                    each val, index in alerts
                         +insert_table(index, val)
         // /.box-body
         .box-footer.clearfix

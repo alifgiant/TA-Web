@@ -31,6 +31,8 @@ app.use(require('node-sass-middleware')({
 }));
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.static(path.join(__dirname, '/node_modules/admin-lte/')));
+app.use(express.static(path.join(__dirname, '/node_modules/font-awesome/')));
+app.use(express.static(path.join(__dirname, '/node_modules/ionicons/')));
 // app.use(express.static(path.join(__dirname, '/node_modules/bootstrap/dist/')));
 
 /*USER HANDLE*/

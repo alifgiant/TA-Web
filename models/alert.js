@@ -1,20 +1,17 @@
 /**
- * Created by g40 on 30/07/16.
+ * Created by maakbar on 30/07/16.
  */
 
 var mongoose = require('mongoose');
-var uniqueValidator = require('mongoose-unique-validator');
 var Schema = mongoose.Schema;
 
 var Alert = new Schema({
-    alert_id: { type: 'string', unique: true },
+    // alert_id: { type: String, unique: true },
+    device_id: String,    
     date: { type: Date, default: Date.now },
-    _patient: { type: Schema.Types.ObjectId, ref: 'Patient' },
-    detail: String,
-    status: Boolean
+    status: String,
+    occurance: Number
 });
-
-Alert.plugin(uniqueValidator);
 
 module.exports = mongoose.model('Alert', Alert);
 

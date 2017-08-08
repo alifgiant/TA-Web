@@ -11,15 +11,23 @@ block content
             form.form-horizontal(method='POST')
                 .box-body
                     .form-group
-                        label.col-sm-2.control-label Device id
+                        label.col-sm-2.control-label Id
                         if has_error
                             .col-sm-10.has-error
-                                input.form-control(name='device_id', type='text', required=true, placeholder='Device ID')
+                                input.form-control(name='device_id', type='text', required=true, placeholder='PPG001')
                             script.
                                 alert('Device Id telah terpakai');
                         else
                             .col-sm-10
-                                input.form-control(name='device_id', type='text', required=true, placeholder='Device ID')
+                                input.form-control(name='device_id', type='text', required=true, placeholder='PPG001')
+                    .form-group
+                        label.col-sm-2.control-label Type
+                        .col-sm-10
+                            input.form-control(name='device_type', type='number', min='0', max='2' required=true, placeholder='1')
+                    .form-group
+                        label.col-sm-2.control-label Freq
+                        .col-sm-10
+                            input.form-control(name='freq', type='number', min='150', max='360' required=true, placeholder='200')
                 // /.box-body
                 .box-footer
                     .col-xs-6.col-md-6.col-xs-offset-3.col-md-offset-3

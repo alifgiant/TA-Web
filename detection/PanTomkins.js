@@ -125,7 +125,7 @@ class Detector{
         const squared = math.pow(derr, 2);
         const mwi = this.mwi_filter.execute(squared);
         
-        callback('filter', derr);  // tell filtered result to other devices        
+        callback('filter', derr);  // tell filtered result to other devices
 
         // load data to window
         this.sample.push(mwi);

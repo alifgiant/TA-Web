@@ -8,9 +8,9 @@
  */
 
 let BeatCategory = {
-    normal: {code: 1, name: "Normal", annotation: ['N', 'P', 'f', 'p', 'L', 'R',' Q']},
-    pvc: {code: 2, name: "PVC", annotation: ['V']},
-    vf: {code: 3, name: "Ventricular Flutter/Fibrillation", annotation: ['[', '!', ']']},
+    normal: {code: 1, name: "Normal", annotation: ['.', 'N', '/', 'L', 'R', 'Q', 'f', 'x']},
+    pc: {code: 2, name: "PVC", annotation: ['V', 'A', 'a', 'J', 'S', 'F']},
+    vf: {code: 3, name: "Ventricular Flutter/Fibrillation", annotation: ['!']},
     HeartBlock: {code: 4, name: "Heart Block", annotation: ['(BII']}
 };
 
@@ -23,6 +23,8 @@ let RhythmCategory = {
     vfl : {name: 'Ventricular Flutter/fibrillation'},
     BII : {name: 'heart block'}
 };
+
+let temp = 0;
 
 class BeatClassifier{
     constructor(sampling_freq){
@@ -59,7 +61,7 @@ class BeatClassifier{
     C1(window) {
         const RR1 = window[0];
         const RR2 = window[1];
-        return RR2 < this.duration(0.6) && this.duration(1.8)*RR2 < RR1;
+        return RR2 < this.duration(0.6) && 1.8*RR2 < RR1;
     }
 
     /**
@@ -146,20 +148,23 @@ class BeatClassifier{
 
         // fill as prior normal (category 1)
         this.beat_class = new Array(this.rr_holder.length).fill('normal');
-        let category = [];
+        // let category = [];
 
         let shouldStop = false;
         let i = 0;  // first window
+        let pulseCount = 0;
         while (i < segmentLength-2 && !shouldStop) {
-            // VF area
+            // VF area            
             if (this.C1(this.get_r_window(i))) {
-                let pulseCount = 0;
-                do {
-                    category[i] = 'vf';  // set category Ventricular Flutter/Fibrillation
+                // category[i] = 'vf';
+                // pulseCount += 1
+                // i += 1
+                while (i < segmentLength - 2 /* stop if last 2 element */
+                    && this.C2(this.get_r_window(i))){
+                    this.beat_class[i] = 'vf';  // set category Ventricular Flutter/Fibrillation
                     i += 1;  // move to next windows
                     pulseCount += 1;
-                } while (i < segmentLength - 2 /* stop if last 2 element */
-                    && this.C2(this.get_r_window(i)));
+                }
                 if (i >= segmentLength - 2){
                     shouldStop = true;
                     i -= pulseCount;
@@ -168,17 +173,20 @@ class BeatClassifier{
                     while (pulseCount > 0) {
                         i -= 1;
                         pulseCount -= 1;
-                        category[i] = 'normal';  // set category normal
+                        this.beat_class[i] = 'normal';  // set category normal
                     }
                 }
             }
+
+            // console.log(temp, (this.C3(this.get_r_window(i)) || this.C4(this.get_r_window(i)) || this.C5(this.get_r_window(i))));
+            // temp += 1;
             if (!shouldStop &&
                 (this.C3(this.get_r_window(i)) || this.C4(this.get_r_window(i)) || this.C5(this.get_r_window(i)))) {
-                category[i] = 'pvc';  // set category PVC
+                this.beat_class[i] = 'pc';  // set category PVC
             }
-            if (!shouldStop && this.C6(this.get_r_window(i))) {
-                category[i] = 'HeartBlock';  // set category Heart Block
-            }
+            // if (!shouldStop && this.C6(this.get_r_window(i))) {
+            //     category[i] = 'HeartBlock';  // set category Heart Block
+            // }
             i += 1;  // move to next windows
         }
         this.rr_holder.splice(0, i);  // slice from i - 1 to last

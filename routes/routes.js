@@ -91,7 +91,9 @@ router.get('/device-add', (req, res, next) => {
 
 router.post('/device-add', function (req, res, next) {
     let newDevice = new Device({
-        device_id : req.body.device_id
+        device_id : req.body.device_id,
+        device_type : req.body.device_type,
+        freq : req.body.freq
     });
     newDevice.save(function (err, newDevice) {
         if (err) {

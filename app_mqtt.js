@@ -1,106 +1,159 @@
 /**
  * Created by MuhammadAlif on 10/23/2016.
  */
-'use strict';
+ 'use strict';
 
 const fs = require('fs');
 let EventEmitter = require('events').EventEmitter;
-let detector = require('./detection/algorithm');
+let Detector = require('./detection/algorithm');
 let time_holder = [];
+
+let Device = require('./models/device');
 
 // let count = 0;
 // let start = process.hrtime();
 
 class AlgorithmCallBack{
-    constructor(sensorId, broker, io){
-        this.sensorId = sensorId;
-        this.broker = broker;
-        this.io = io;    
-    }
+	constructor(broker, io){		
+		this.broker = broker;
+		this.io = io;    
+	}
 
-    createMessage(topic, data){
-        return {
-            topic: this.sensorId+ '/' + topic,
-            payload: data.toString(), // or a Buffer
-            // payload: filtered, // or a Buffer
-            qos: 0, // 0, 1, or 2
-            retain: false // or true
-        };
-    }
+	createMessage(sensorId, topic, data){
+		return {
+			topic: sensorId + '/' + topic,
+			payload: JSON.stringify(data), // or a Buffer
+			// payload: filtered, // or a Buffer
+			qos: 0, // 0, 1, or 2
+			retain: false // or true
+		};
+	}
 
-    filteredCallback(filtered) {
-        let message = this.createMessage('visual', filtered);
+	filteredCallback(sensorId, filtered) {
+		let message = this.createMessage(sensorId, 'visual', filtered);
 
-        // continue the filtered message to all subscribers
-        // console.log('forward filtered:'+ this.sensorId, filtered);
-        
-        this.broker.publish(message);
-        this.io.emit(message.topic, message.payload);
-    }
+		// continue the filtered message to all subscribers
+		// console.log('forward filtered:'+ this.sensorId, filtered);
+		
+		this.broker.publish(message);		
+		this.io.emit(message.topic, message.payload);
+	}
 
-    bpmCallback(bpm){
-        let message = this.createMessage('bpm', bpm);
+	bpmCallback(sensorId, bpm){
+		let message = this.createMessage(sensorId, 'bpm', bpm);
 
-        // continue the bpm message to all subscribers
-        // console.log('forward bpm:'+ this.sensorId, bpm);
-        
-        this.broker.publish(message);
-        this.io.emit(message.topic, message.payload);
-    }
+		// continue the bpm message to all subscribers
+		// console.log('forward bpm:'+ this.sensorId, bpm);
+		
+		this.broker.publish(message);
+		this.io.emit(message.topic, message.payload);
+	}
+
+	beatClassCallback(sensorId, beatClass){		
+		let message = this.createMessage(sensorId, 'class', beatClass);
+		// console.log('beatClass', message);
+
+		// continue the filtered message to all subscribers
+		// console.log('forward filtered:'+ this.sensorId, filtered);
+		
+		this.broker.publish(message);		
+		this.io.emit(message.topic, message.payload);
+	}
 }
 
 class MqttApp{
-    constructor(broker, socket){
-        this.broker = broker;
-        this.io = socket;        
+	constructor(broker, socket){
+		this.broker = broker;
+		this.io = socket;
 
-        // event emitter
-        this.emitter = new EventEmitter();        
-        this.emitter.on('sensor', (sensorId, data) => {
-            this.sensorEvent(sensorId, data);
-        });
-        this.emitter.on('phone', (userId, data) => {
-            this.phoneEvent(userId, data);
-        });
-        this.emitter.on('check', (userId, data) => {
-            console.log(time_holder);
-            fs.writeFileSync('./data.json', JSON.stringify(time_holder, null, 2) , 'utf-8');
-        });
-    }
+		this.detector_callback = new AlgorithmCallBack(broker, socket);
+		this.detector = new Detector(this.detector_callback);
 
-    sensorEvent(sensorId, data) {
-        // // DELAY Reader
-        // count += 1;
-        // let stop = process.hrtime(start);
-        // console.log('counter', count);
-        // time_holder.push(stop);
-        // start = process.hrtime();
-        // // DELAY Reader
+		// event emitter
+		this.emitter = new EventEmitter();        
+		this.emitter.on('sensor', (sensorId, data) => {
+			this.sensorEvent(sensorId, data);
+		});
+		this.emitter.on('phone', (userId, data) => {
+			this.phoneEvent(userId, data);
+		});
+		this.emitter.on('check', (userId, data) => {
+			console.log(time_holder);
+			fs.writeFileSync('./data10.json', JSON.stringify(time_holder, null, 2) , 'utf-8');
+		});
+	}
 
-        // console.log(sensorId, ',', data, stop);        
+	onMessageReceived(packet, client) {
+		/* packet received */
+		// console.log('MQTT: Published topic', packet.topic);
+		// console.log('MQTT: Published payload', packet.payload.toString('ascii'));
+		// rootTopic: [0] = tipe publish, [1] = id
+		let rootTopic = packet.topic.split('/');    
 
-        // console.log('get sensor read:'+sensorId, data);
-        let start = process.hrtime();
-        detector(sensorId, data, new AlgorithmCallBack(sensorId, this.broker, this.io));
-        let stop = process.hrtime(start);
-        time_holder.push(stop);
-    }
+		// route message event
+		this.emitter.emit(rootTopic[1], rootTopic[0], packet.payload.toString());        
+	}
 
-    phoneEvent (userId, data) {
-        let obj = JSON.parse(data);
-        // console.log('get phone data '+userId, obj);
-    }
+	clientConnected(client_id){
+		// clientID = client.id;  // log a connected device
+		console.log('MQTT ClientConnected: ', client_id);
 
-    receivedDataCallBack (packet, client) {
-        /* packet received */
-        // console.log('MQTT: Published topic', packet.topic);
-        // console.log('MQTT: Published payload', packet.payload.toString('ascii'));
-        // rootTopic: [0] = tipe publish, [1] = id
-        let rootTopic = packet.topic.split('/');    
+		let detector = this.detector;
+		process.nextTick(() => {  // do in next tick
+			Device.findOne({device_id: client_id}, function (err, device) {
+	 			if (device){
+	 				// create new process id 				
+	 				detector.addDevice(device.device_id, device.device_type, device.freq);
+	 			}else {
+	 				// ignore
+	 			}
+	 		});
+ 		});
+	}
 
-        // emit event
-        this.emitter.emit(rootTopic[1], rootTopic[0], packet.payload.toString());        
-    }
+	clientDisconnected(client_id){
+		// clientID = client.id;  // log a disconnected device  
+		console.log('MQTT ClientDisconnected: ', client_id);
+
+		let detector = this.detector;
+		process.nextTick(() => {  // do in next tick
+			Device.findOne({device_id: client_id}, function (err, device) {
+	 			if (device){
+	 				// free process id
+	 				detector.removeDevice(client_id);	 			
+	 			}else {
+	 				// ignore
+	 			}
+	 		});
+ 		});		
+	}
+
+	sensorEvent(sensorId, message) {
+		// // DELAY Reader
+		// // count += 1;
+		// let stop = process.hrtime(start);
+		// // console.log('counter', count);
+		// time_holder.push(stop);
+		// start = process.hrtime();
+		// // DELAY Reader
+
+		// console.log(sensorId, ',', message);		
+
+		// // console.log('get sensor read:'+sensorId, data);
+		// let start = process.hrtime();
+		let detector = this.detector;
+		process.nextTick(() => {  // do in next tick
+			message = message.split(':');
+			detector.processSample(sensorId, message[0], message[1]);
+		});
+		// let stop = process.hrtime(start);
+		// time_holder.push(stop);
+	}
+
+	phoneEvent (userId, data) {
+		let obj = JSON.parse(data);
+		// console.log('get phone data '+userId, obj);
+	}
 }
 
 module.exports = MqttApp;

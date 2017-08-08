@@ -5,6 +5,7 @@ let express = require('express');
 let router = express.Router();
 let Doctor = require('../models/doctor');
 let Patient = require('../models/patient');
+let Alert = require('../models/alert');
 let utils = require('./utils');
 let passport = require('passport');
 
@@ -54,7 +55,44 @@ router.get('/patient/add', utils.isAuthenticated, (req, res) => {
 });
 
 router.get('/record', utils.isAuthenticated, (req, res) => {    
-    res.render('menu/record');
+    Doctor.findOne({username: req.query.user}).then((doctor) =>{
+        if (doctor){
+            const patients = doctor.patients
+            // console.log(patients);
+
+            let patients_device = {};
+            let query = [];
+            for (let i = 0; i < patients.length; i++){
+                query[i] = patients[i].device_id;
+                patients_device[patients[i].device_id] = {
+                    full_name: patients[i].full_name,
+                    phone_num: patients[i].phone_num
+                };
+            }
+
+            // console.log(patients_device);
+            // console.log(query);
+
+            Alert.find({}).where('device_id').in(query).then((record) => {
+                let alerts = [];
+                for (let i = 0; i < record.length; i++) {
+                    alerts.push({
+                        time : record[i].date,
+                        full_name : patients_device[record[i].device_id].full_name,
+                        device_id : record[i].device_id,
+                        phone_num : patients_device[record[i].device_id].phone_num,
+                        type : record[i].status,
+                        occurance : record[i].occurance
+                    });                    
+                }                
+
+                res.render('menu/record', {
+                    alerts: alerts                    
+                });
+            });        
+        }
+    });
+    
 });
 
 module.exports = router;
