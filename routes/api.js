@@ -27,6 +27,7 @@ router.post('/device/add', function (req, res, next) {
 });  // Tested
 
 router.post('/:user/login', function(req, res, next) {
+    console.log('here');
     if (req.params.user === 'doctor'){
         let strategy = 'sign-in-doctor';
     }else if (req.params.user === 'patient'){
@@ -57,7 +58,7 @@ router.post('/:user/login', function(req, res, next) {
                 })
             }
         }
-        else {
+        else {            
             req.logIn(user, function (err) {
                 if (err) {
                     res.status(err.status || 503);

@@ -19,45 +19,64 @@ class AlgorithmCallBack{
 		this.io = io;    
 	}
 
-	createMessage(sensorId, topic, data){
+	createMessage(sensorId, topic, data, retain){
 		return {
 			topic: sensorId + '/' + topic,
 			payload: JSON.stringify(data), // or a Buffer
 			// payload: filtered, // or a Buffer
 			qos: 0, // 0, 1, or 2
-			retain: false // or true
+			retain: retain // or true
 		};
 	}
 
 	filteredCallback(sensorId, filtered) {
-		let message = this.createMessage(sensorId, 'visual', filtered);
+		let message = this.createMessage(sensorId, 'visual', filtered, false);
 
 		// continue the filtered message to all subscribers
 		// console.log('forward filtered:'+ this.sensorId, filtered);
 		
-		this.broker.publish(message);		
-		this.io.emit(message.topic, message.payload);
+		this.broker.publish(message);		// to phone
+		this.io.emit(message.topic, message.payload);  // to web
 	}
 
 	bpmCallback(sensorId, bpm){
-		let message = this.createMessage(sensorId, 'bpm', bpm);
+		let message = this.createMessage(sensorId, 'bpm', bpm, true);
 
 		// continue the bpm message to all subscribers
 		// console.log('forward bpm:'+ this.sensorId, bpm);
 		
-		this.broker.publish(message);
-		this.io.emit(message.topic, message.payload);
+		this.broker.publish(message);  // to phone
+		this.io.emit(message.topic, message.payload);  // to web
 	}
 
 	beatClassCallback(sensorId, beatClass){		
-		let message = this.createMessage(sensorId, 'class', beatClass);
+		let message = this.createMessage(sensorId, 'class', beatClass, false);
+		this.io.emit(message.topic, message.payload); // to web
+
 		// console.log('beatClass', message);
 
 		// continue the filtered message to all subscribers
 		// console.log('forward filtered:'+ this.sensorId, filtered);
 		
+		let title = '';
+		let detail = '';
+		let condition = 0;
+		if (beatClass.vf > 0){
+			title = 'Condition: Dangerous';
+			detail = 'Please see Doctor immediately, VF detected';
+			condition = 2;
+		}else if (beatClass.pc > 0) {
+			title = 'Condition: Sick';
+			detail = 'Please be Carefull, PC detected';
+			condition = 1;
+		}else {
+			title = 'Condition: Normal';
+			detail = 'Nothing to worry';
+			condition = 0;
+		}
+		let data = title + '#' + detail + '#' + condition;
+		message = this.createMessage(sensorId, 'alert', data, false);
 		this.broker.publish(message);		
-		this.io.emit(message.topic, message.payload);
 	}
 }
 
