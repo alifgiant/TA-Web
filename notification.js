@@ -7,9 +7,9 @@ const ENDPOINT = '/messages';
 
 // CONFIG for get token
 const URL_TOKEN = 'https://api.mainapi.net/token';
-// token below signed from kiswanto_d2@yahoo.com
+// token below signed from dede.kiswanto@yahoo.co.id
 // need to change this, if quota sms has reached limit
-const AUTH_TOKEN = 'a29MM0N0VlNYaXBiXzR2OEpQYU9oeERVeHpnYTpQUzlNTlh4VFpEZVJmR0Vpd0ZDTERwYzFVTDBh';
+const AUTH_TOKEN = 'RENjOUJ2R2EwUVp3eVFLMGpxTktQSlFzcTdJYTpSVmp6SVFtZUdKTHNkU0x0Ylc3bmJzamhFWklh';
 
 const requestApi = function(number, message, accessToken){
 
@@ -60,3 +60,5 @@ const sendMessage = function(number, message){
 // Example Usage (Tested + Worked)
 // getToken();
 // sendMessage('085399044108', 'From Javascript using SuperAgent (Re-request token, for failsafe)');
+
+module.exports = sendMessage;

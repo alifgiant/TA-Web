@@ -9,6 +9,8 @@ let Detector = require('./detection/algorithm');
 let time_holder = [];
 
 let Device = require('./models/device');
+let Patient = require('./models/patient');
+const sendMessage = require('./notification');
 
 // let count = 0;
 // let start = process.hrtime();
@@ -69,6 +71,17 @@ class AlgorithmCallBack{
 			title = 'Condition: Sick';
 			detail = 'Please be Carefull, PC detected';
 			condition = 1;
+
+            // when gets 2 alert send sms (condition based on dataset)
+            if (beatClass.pc === 2){
+                Patient.findOne({device_id: sensorId}, (err, data) => {
+					if (!err){
+                        const phoneNumber = data.my_phone;
+                        const message = `${data.full_name} mengalami aritmia, segera melakukan pengecekan kondisi`;
+                        sendMessage(phoneNumber, message)
+					}
+                });
+            }
 		}else {
 			title = 'Condition: Normal';
 			detail = 'Nothing to worry';
