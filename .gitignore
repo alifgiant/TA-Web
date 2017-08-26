@@ -49,3 +49,6 @@ jspm_packages
 
 # Yarn Integrity file
 .yarn-integrity
+
+# ignore yarn.lock
+yarn.lock
