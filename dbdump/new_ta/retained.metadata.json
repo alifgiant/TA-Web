@@ -1,1 +1,1 @@
-{"options":{},"indexes":[{"v":2,"key":{"_id":1},"name":"_id_","ns":"new_ta.retained"},{"v":2,"unique":true,"key":{"topic":1},"name":"topic_1","ns":"new_ta.retained"}]}
+{"options":{},"indexes":[{"v":1,"key":{"_id":1},"name":"_id_","ns":"new_ta.retained"},{"v":1,"unique":true,"key":{"topic":1},"name":"topic_1","ns":"new_ta.retained"}]}
