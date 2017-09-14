@@ -6,6 +6,7 @@ let classifier = require('./classifier');
 let PanTomkins = require('./PanTomkins');
 let Sample = require('../models/sample');
 let Alert = require('../models/alert');
+let Patient = require('../models/patient');
 
 // const SAMPLING_FREQUENCY = 200;
 // const SAMPLING_FREQUENCY = 360;
@@ -106,6 +107,41 @@ class Algortihm{
 				saveAlert(sensorId, 'vf', data.vf);
 				console.log('called vf');
 			}
+
+			// data = { vf, pc, normal }
+			Patient.findOne({device_id: sensorId},function(err, patient){
+
+				if ('pc' in data){
+                    if (patient.total_pvc !== undefined){
+                        patient.total_pvc += data.pc
+                    } else {
+                        patient.total_pvc = data.pc
+                    }
+				}
+
+				if ('normal' in data){
+                    if (patient.total_normal !== undefined){
+                        patient.total_normal += data.normal
+                    } else {
+                        patient.total_normal = data.normal
+                    }
+                }
+
+                if ('vf' in data){
+                    if (patient.total_vf !== undefined){
+                        patient.total_vf += data.vf
+                    } else {
+                        patient.total_vf = data.vf
+                    }
+				}
+
+				// console.log(patient);
+                patient.save(function (err) {
+                    if (err) {
+                        console.log(err);
+                    }
+                });
+			});
 
 			callback.beatClassCallback(sensorId, data);
 		});

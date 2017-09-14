@@ -78,7 +78,7 @@ class AlgorithmCallBack{
 					if (!err){
                         const phoneNumber = data.my_phone;
                         const message = `${data.full_name} mengalami aritmia, segera melakukan pengecekan kondisi`;
-                        sendMessage(phoneNumber, message)
+                        // sendMessage(phoneNumber, message)
 					}
                 });
             }

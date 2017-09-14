@@ -26,7 +26,7 @@ let Patient = new Schema({
     // device_id: {type: Schema.Types.ObjectId, ref: 'Device'}
     total_normal: Number,
     total_pvc: Number,
-    total_pf: Number,
+    total_vf: Number,
 });
 
 Patient.plugin(uniqueValidator);

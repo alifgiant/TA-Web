@@ -58,15 +58,15 @@ section.content
                         li
                             a
                                 | Normal
-                                span.pull-right.badge#total-normal 0
+                                span.pull-right.badge#total-normal=patient.total_normal || 0
                         li
                             a
                                 | PVC
-                                span.pull-right.badge#total-pvc 0
+                                span.pull-right.badge#total-pvc=patient.total_pvc || 0
                         li
                             a
                                 | VF
-                                span.pull-right.badge#total-vf 0
+                                span.pull-right.badge#total-vf=patient.total_vf || 0
 
         .col-md-8
             // Area chart

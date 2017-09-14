@@ -130,6 +130,12 @@ function setupPatientDetail(){
 		var status_pvc = $('#status-pvc');
 		var status_vf = $('#status-vf');
 
+		var total_normal = $("#total-normal");
+		var total_pvc = $("#total-pvc");
+		var total_vf = $("total-pvc");
+
+		// console.log(total_normal, total_pvc, total_vf);
+
 		// console.log('payload', payload);
 		payload = JSON.parse(payload);
 
@@ -138,10 +144,14 @@ function setupPatientDetail(){
 		status_pvc.text(0);
 		status_vf.text(0);
 
+		console.log(payload);
 		// fill later
 		status_normal.text(payload.normal);
 		status_pvc.text(payload.pc);
 		status_vf.text(payload.vf);
+
+		// update statistic data
+
 
 		if(payload.pc > 0 || payload.vf > 0) playSound();
 	});
