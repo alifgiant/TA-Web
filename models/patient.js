@@ -22,8 +22,11 @@ let Patient = new Schema({
     emergency_phone: String,
     age : Number,
     is_male : Boolean,
-    device_id: String
+    device_id: String,
     // device_id: {type: Schema.Types.ObjectId, ref: 'Device'}
+    total_normal: Number,
+    total_pvc: Number,
+    total_pf: Number,
 });
 
 Patient.plugin(uniqueValidator);
