@@ -132,9 +132,7 @@ function setupPatientDetail(){
 
 		var total_normal = $("#total-normal");
 		var total_pvc = $("#total-pvc");
-		var total_vf = $("total-pvc");
-
-		// console.log(total_normal, total_pvc, total_vf);
+		var total_vf = $("total-vf");
 
 		// console.log('payload', payload);
 		payload = JSON.parse(payload);
@@ -150,7 +148,15 @@ function setupPatientDetail(){
 		status_pvc.text(payload.pc);
 		status_vf.text(payload.vf);
 
-		// update statistic data
+		// data segment
+		var normal_val = parseInt(payload.normal) || 0;
+		var pvc_val  = parseInt(payload.pc) || 0;
+		var vf_val = parseInt(payload.vf) || 0;
+
+        // update statistic data in view
+        total_normal.text(parseInt(total_normal.text()) + normal_val);
+        total_pvc.text(parseInt(total_pvc.text()) + pvc_val);
+        total_vf.text(parseInt(total_vf.text()) + vf_val);
 
 
 		if(payload.pc > 0 || payload.vf > 0) playSound();
