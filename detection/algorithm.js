@@ -174,7 +174,14 @@ class Algortihm{
 	}
 
 	processSample(sensorId, index, data){
-		if (this.holder[sensorId].type > 0){
+		
+		console.log(sensorId, this.holder);
+		
+		if (this.holder[sensorId] === undefined) {
+			return false
+		}	
+				
+		if (this.holder[sensorId].type > 0){	
 			data = (data * 3) / 1024;  // turn to volt
 		}
 
